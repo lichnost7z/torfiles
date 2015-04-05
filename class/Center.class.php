@@ -95,6 +95,9 @@ class Center {
 					$this->header .= "\t\t<option value=".$nc."|".$key.">".$key."</option>\r\n";
 				}
 			}
+
+            //dfkljs
+
 			$this->header .= "</select>
 			<span class='label'>Сортировать по:</span><select class='span2 sort'>";
 
