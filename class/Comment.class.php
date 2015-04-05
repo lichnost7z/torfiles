@@ -1,63 +1,67 @@
 <?php
-class Comment {
-	private $getId;
-	private $str;
 
-	public function __construct($id) {
-		if($id) {
-			$this->getId = intval(abs($id));
-			$query = Db::getInst()->query("SELECT MAX(idfilesone) FROM files");
-			$result = $query->fetch(PDO::FETCH_ASSOC);
-			if($this->getId < 0) $this->getId = 1;
-			if($this->getId > $result['MAX(idfilesone)']) $this->getId = $result['MAX(idfilesone)'];
-		} else {
-			exit;
-		}
-	}
+class Comment
+{
+    private $getId;
+    private $str;
 
-	public function Comm() {
+    public function __construct($id)
+    {
+        if ($id) {
+            $this->getId = intval(abs($id));
+            $query = Db::getInst()->query("SELECT MAX(idfilesone) FROM files");
+            $result = $query->fetch(PDO::FETCH_ASSOC);
+            if ($this->getId < 0) $this->getId = 1;
+            if ($this->getId > $result['MAX(idfilesone)']) $this->getId = $result['MAX(idfilesone)'];
+        } else {
+            exit;
+        }
+    }
 
-		if(@isset($_POST['submess'])) {
+    public function Comm()
+    {
 
-			$name = trim(htmlspecialchars($_POST['nameuser']));
-			$message = trim(htmlspecialchars($_POST['message']));
+        if (@isset($_POST['submess'])) {
 
-			try {
+            $name = trim(htmlspecialchars($_POST['nameuser']));
+            $message = trim(htmlspecialchars($_POST['message']));
 
-				if($_POST['user_code'] != $_SESSION['code'])
-					throw new Exception("Код с картинки введен не верно!");
-				if(strlen($name) > 50) 
-					throw new Exception("Имя не должно превышать 50 символов!");
-				if(strlen($message) > 550) 
-					throw new Exception("Сообщения не должно превышать 550 символов!");
-				if(strlen($name) <= 0) 
-					$name = 'Anonymous';
-				if(strlen($message) <= 0) 
-					throw new Exception("Сообщения не может быть пустым");
+            try {
 
-				
-				$sqlinsert = "INSERT INTO comment (idfiles, `name`, message, `date`) VALUES (".$this->getId.",'".$name."','".$message."',".time().")";
-
-				$query = Db::getInst()->query($sqlinsert);
-
-				if($query) {
-					@header("Location: /files.php?id=".$this->getId);
-				} else {
-					throw new Exception("Error");
-				}
-
-			} catch (Exception $e) {
-				echo $e->getMessage();
-				exit();
-			}
-
-		}
+                if ($_POST['user_code'] != $_SESSION['code'])
+                    throw new Exception("Код с картинки введен не верно!");
+                if (strlen($name) > 50)
+                    throw new Exception("Имя не должно превышать 50 символов!");
+                if (strlen($message) > 550)
+                    throw new Exception("Сообщения не должно превышать 550 символов!");
+                if (strlen($name) <= 0)
+                    $name = 'Anonymous';
+                if (strlen($message) <= 0)
+                    throw new Exception("Сообщения не может быть пустым");
 
 
-		$sql = "SELECT * FROM comment WHERE idfiles = ".$this->getId;
-		$query = Db::getInst()->query($sql);
-		$count = $query->rowCount();
-		$this->str .= "<div class='comment'><form class='form-horizontal' method='POST'>
+                $sqlinsert = "INSERT INTO comment (idfiles, `name`, message, `date`) VALUES (" . $this->getId . ",'" . $name . "','" . $message . "'," . time() . ")";
+
+                $query = Db::getInst()->query($sqlinsert);
+
+                if ($query) {
+                    @header("Location: /files.php?id=" . $this->getId);
+                } else {
+                    throw new Exception("Error");
+                }
+
+            } catch (Exception $e) {
+                echo $e->getMessage();
+                exit();
+            }
+
+        }
+
+
+        $sql = "SELECT * FROM comment WHERE idfiles = " . $this->getId;
+        $query = Db::getInst()->query($sql);
+        $count = $query->rowCount();
+        $this->str .= "<div class='comment'><form class='form-horizontal' method='POST'>
 							<legend>Комментaрии</legend>
 							<div class='control-group'>
 								<label class='control-label' for='inputNameUser'>Имя</label>
@@ -83,20 +87,20 @@ class Comment {
 							</div>
 						</form>";
 
-		if($count) {
+        if ($count) {
 
-			while($result = $query->fetch(PDO::FETCH_ASSOC)) {
-				$date = date('Y|m|d H:i:s', $result['date']);
+            while ($result = $query->fetch(PDO::FETCH_ASSOC)) {
+                $date = date('Y|m|d H:i:s', $result['date']);
 
-				$this->str .= $result['name'].$result['message'].$date;
+                $this->str .= $result['name'] . $result['message'] . $date;
 
-			}
+            }
 
-		} else {
-			$this->str .= "Коментарии ещо никто не добавлял";
-		}
+        } else {
+            $this->str .= "Коментарии ещо никто не добавлял";
+        }
 
 
-		return $this->str."</div>";
-	}
+        return $this->str . "</div>";
+    }
 }
